@@ -2,19 +2,10 @@ import ProjectConfigs
 import requests
 import bs4
 
-
-# def initialize_session() -> requests.Session:
-#     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0',
-#                'Accept-Language': 'en-US, en;q=0.5'}
-#     session = requests.session()
-#     session.headers.update(headers)
-#     return session
-
 def _get_soup(link: str) -> bs4.BeautifulSoup | None:
     headers = ({'User-Agent': ProjectConfigs.configs['scrapeConfigs']['userAgent'],
                 'Accept-Language': ProjectConfigs.configs['scrapeConfigs']['acceptLang']})
 
-    # Check for error response code
     try:
         response = requests.get(link, headers=headers)
         response.raise_for_status()
@@ -24,11 +15,6 @@ def _get_soup(link: str) -> bs4.BeautifulSoup | None:
         print(f"There was an issue trying to download the web page ({link}):\n{exc}")
         return None
 
-# def _get_soup_session(session: requests.Session, link: str):
-#     response = session.get(link)
-#     soup = bs4.BeautifulSoup(response.text, "lxml")
-#     return soup
-
 def get_data_amazon(link: str):
     soup = _get_soup(link)
 
@@ -36,9 +22,8 @@ def get_data_amazon(link: str):
     data = {}
 
     if soup:
-        # get the price
+        # get the price, removing any leading/trailing whitespace and commas
         price_whole = soup.select('.priceToPay')
-
         if len(price_whole) > 0:
             data['price'] = price_whole[0].getText().strip().replace(',', '')
 
@@ -49,19 +34,10 @@ def get_data_amazon(link: str):
 
     return data
 
+# TODO: delete
 def test_scrape(link: str):
     soup = _get_soup(link)
 
     prices = soup.select('.priceToPay')
 
     return [price.getText() for price in prices]
-
-
-# def get_data_amazon_session(session: requests.Session, link: str):
-#     soup = _get_soup_session(session, link)
-#     price_whole = soup.select("span.reinventPricePriceToPayMargin:nth-child(3)")
-#
-#     if len(price_whole) > 0:
-#         return price_whole[0].getText()
-#     else:
-#         return "NA"

@@ -69,8 +69,7 @@ def initialize() -> None:
             # If not provided, allow user to enter in console
             if not _field_exists('emailConfigs', 'password'):
                 print("No app password provided. Please enter the app password")
-                password = getpass.getpass("\tEnter password: ")
-                # TODO: validate user input
+                configs['emailConfigs']['password'] = getpass.getpass("\tEnter password: ")
             print("Email app password set")
 
             # validate receiver email (optional)
@@ -116,7 +115,6 @@ def initialize() -> None:
 
         # if 'scrapeConfigs' field is missing
         else:
-            # raise ConfigurationException("config.yaml: The field \"scrapeConfigs\" is missing")
             # add scrapeConfigs to configs dict for default values
             configs['scrapeConfigs'] = {}
             # set default user agent

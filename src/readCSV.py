@@ -21,7 +21,6 @@ def update_csv(data: [dict]):
     """
     Updates the csv with the new data
     :param data: A 2-d list representing the data to place in the csv file
-    :return: Success code. 1 if successful, -1 if not
     """
     fields = ProjectConfigs.configs['csvConfigs']['fieldNames']
     try:
@@ -34,6 +33,5 @@ def update_csv(data: [dict]):
         # Write the data starting from the second row of the csv
         writer.writerows(data)
         csv_file.close()
-        return 1
-    except FileNotFoundError:
-        return -1
+    except Exception as e:
+        print(f"There was an error trying to update the csv:\n{e}")
