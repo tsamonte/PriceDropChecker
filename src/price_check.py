@@ -1,7 +1,12 @@
 import scrape_prices
-import EmailHandler
+import email_handler
 
 def _price_to_float(price_string: str) -> float:
+    """
+    Converts a price string to a float
+    :param price_string: Price string with leading "$" symbol
+    :return: Float of the passed in string
+    """
     return float(price_string.strip('$'))
 
 def _update_name(row: dict, scraped_data: dict) -> None:
@@ -87,9 +92,13 @@ def _update_data(csv_data: [dict]) -> str:
 
     return msg_body
 
-def notify_price_drops(csv_data: [dict]):
+def notify_price_drops(csv_data: [dict]) -> None:
+    """
+    Takes csv data and performs updates. Sends email notifications if a price drop is detected
+    :param csv_data: List of dict representing rows from the csv file
+    """
     msg_body = _update_data(csv_data)
     if msg_body != "":
-        smtp = EmailHandler.login()
-        EmailHandler.send_email(smtp, msg_body)
+        smtp = email_handler.login()
+        email_handler.send_email(smtp, msg_body)
         smtp.quit()

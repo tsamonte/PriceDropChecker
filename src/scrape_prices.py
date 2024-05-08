@@ -3,6 +3,11 @@ import requests
 import bs4
 
 def _get_soup(link: str) -> bs4.BeautifulSoup | None:
+    """
+    Create a bs4.BeautifulSoup object using the passed in link
+    :param link: Web page to be scraped
+    :return: bs4.BeautifulSoup object for the product web page to be scraped
+    """
     headers = ({'User-Agent': ProjectConfigs.configs['scrapeConfigs']['userAgent'],
                 'Accept-Language': ProjectConfigs.configs['scrapeConfigs']['acceptLang']})
 
@@ -15,7 +20,12 @@ def _get_soup(link: str) -> bs4.BeautifulSoup | None:
         print(f"There was an issue trying to download the web page ({link}):\n{exc}")
         return None
 
-def get_data_amazon(link: str):
+def get_data_amazon(link: str) -> dict:
+    """
+    Scrapes the name and price of the product from the link.
+    :param link: Web page to be scraped
+    :return: A dict with keys "name" and "price" retrieved from the web page. Can be empty if invalid web page is provided
+    """
     soup = _get_soup(link)
 
     # Data we want to retrieve from the web page
@@ -33,11 +43,3 @@ def get_data_amazon(link: str):
             data['name'] = item_name[0].getText().strip()
 
     return data
-
-# TODO: delete
-def test_scrape(link: str):
-    soup = _get_soup(link)
-
-    prices = soup.select('.priceToPay')
-
-    return [price.getText() for price in prices]
