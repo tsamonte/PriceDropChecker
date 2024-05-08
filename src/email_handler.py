@@ -1,5 +1,7 @@
 import ProjectConfigs
 import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 def login() -> smtplib.SMTP:
     """
@@ -26,8 +28,29 @@ def send_email(smtp: smtplib.SMTP, msg_body: str) -> None:
     :param smtp: smtplib.SMTP object handling the send
     :param msg_body: Email body for the email containing price drop information
     """
-    subject = "A price drop was detected!"
-    # TODO: change link to hyperlink and add link to source code
-    signature = "Sent from Python\nDeveloped by Tristan Samonte\nhttps://www.linkedin.com/in/tsamonte23/"
-    msg_whole = f"Subject: {subject}\n{msg_body}\n{signature}"
-    smtp.sendmail(ProjectConfigs.configs['emailConfigs']['senderEmail'], ProjectConfigs.configs['emailConfigs']['receiverEmail'], msg_whole)
+    # Initialize MIME object message container
+    msg_whole = MIMEMultipart()
+    msg_whole["From"] = ProjectConfigs.configs['emailConfigs']['senderEmail']
+    msg_whole["To"] = ProjectConfigs.configs['emailConfigs']['receiverEmail']
+    msg_whole["Subject"] = "A price drop was detected!"
+
+    # Initialize email signature string
+    signature = """\
+    <html>
+        <body>
+            <p>
+                Sent from Python
+                <br>Developed by Tristan Samonte (<a href="https://github.com/tsamonte/PriceDropChecker">Source</a>)
+                <br><a href="https://www.linkedin.com/in/tsamonte23">LinkedIn</a> | <a href="https://github.com/tsamonte">GitHub</a>
+            </p>
+        </body>
+    </html>
+    """
+
+    # Add the message body and signature to message container
+    msg_whole.attach(MIMEText(msg_body, 'html'))
+    msg_whole.attach(MIMEText(signature, 'html'))
+
+    # Send the email
+    smtp.sendmail(ProjectConfigs.configs['emailConfigs']['senderEmail'],
+                  ProjectConfigs.configs['emailConfigs']['receiverEmail'], msg_whole.as_string())

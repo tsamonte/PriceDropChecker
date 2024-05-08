@@ -49,7 +49,7 @@ def _update_prices(row: dict, scraped_data: dict) -> str:
             # Prevents email from being sent multiple times in a row on the same price
             if _price_to_float(scraped_data['price']) < _price_to_float(row['PreviousLow']):
                 difference = _price_to_float(row['StartingPrice']) - _price_to_float(scraped_data['price'])
-                message = f"The item is ${difference:.2f} less than when you added it to your list! Get it now for {scraped_data['price']}"
+                message = f"&emsp;&emsp;The item is ${difference:.2f} less than when you added it to your list! Get it now for {scraped_data['price']}"
                 row['PreviousLow'] = scraped_data['price']
             # If scraped price is also HIGHER than previous low, we don't want to add to email
             # But we should overwrite the stored previous low
@@ -59,7 +59,7 @@ def _update_prices(row: dict, scraped_data: dict) -> str:
         # If scraped price < all-time low
         if _price_to_float(scraped_data['price']) < _price_to_float(row['AllTimeLow']):
             row['AllTimeLow'] = scraped_data['price']
-            message = f"The item has reached an all-time low! Get it now for {scraped_data['price']}"
+            message = f"&emsp;&emsp;The item has reached an all-time low!<br>{message}"
 
     # always set current price to the newly retrieved price
     row['CurrentPrice'] = scraped_data['price']
@@ -88,7 +88,7 @@ def _update_data(csv_data: [dict]) -> str:
         if 'price' in scraped_data.keys():
             msg = _update_prices(row, scraped_data)
             if msg != "":
-                msg_body += f"Item Name - {row['ItemName']}\n\t{msg}\n\t{row['Link']}\n\n"
+                msg_body += f"<p>Item Name - <a href=\"{row['Link']}\">{row['ItemName']}</a><br>{msg}</p><br>"
 
     return msg_body
 
@@ -99,6 +99,7 @@ def notify_price_drops(csv_data: [dict]) -> None:
     """
     msg_body = _update_data(csv_data)
     if msg_body != "":
+        msg_body = f"<html><body>{msg_body}</body></html>"
         smtp = email_handler.login()
         email_handler.send_email(smtp, msg_body)
         smtp.quit()
