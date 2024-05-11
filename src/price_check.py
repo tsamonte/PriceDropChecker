@@ -99,7 +99,13 @@ def notify_price_drops(csv_data: [dict]) -> None:
     """
     msg_body = _update_data(csv_data)
     if msg_body != "":
-        msg_body = f"<html><body>{msg_body}</body></html>"
-        smtp = email_handler.login()
-        email_handler.send_email(smtp, msg_body)
-        smtp.quit()
+        try:
+            msg_body = f"<html><body>{msg_body}</body></html>"
+            smtp = email_handler.login()
+            email_handler.send_email(smtp, msg_body)
+            smtp.quit()
+            print("Price drop notification email sent")
+        # In-depth error messages are logged within the above-called functions
+        # Exceptions here should not end persistent program. Simply do not send email and continue running
+        except:
+            print("Email unable to be sent")

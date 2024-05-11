@@ -12,8 +12,9 @@ def open_csv() -> [dict]:
         data = list(reader)
         csv_file.close()
         return data
+    # If the file is not in expected path, we should end program
     except FileNotFoundError:
-        print("File Not Found")
+        print(f"csv file not found at specified path: \"{ProjectConfigs.configs['csvConfigs']['filePath']}\"")
         raise
 
 
@@ -33,5 +34,9 @@ def update_csv(data: [dict]):
         # Write the data starting from the second row of the csv
         writer.writerows(data)
         csv_file.close()
+    # An error when writing to the csv should not end the program
+    except PermissionError:
+        print(f"Permission denied trying to write to the file at \"{ProjectConfigs.configs['csvConfigs']['filePath']}\".")
+        print("Ensure the file is not being used by any other program and that you have permission to write to it.")
     except Exception as e:
         print(f"There was an error trying to update the csv:\n{e}")

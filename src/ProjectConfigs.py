@@ -1,6 +1,5 @@
 import yaml
 import getpass
-import logging
 from error.ConfigurationException import ConfigurationException
 
 configs = {}
@@ -79,7 +78,6 @@ def initialize() -> None:
                 configs['emailConfigs']['receiverEmail'] = configs['emailConfigs']['senderEmail']
             print(f"Setting receiver email to: {configs['emailConfigs']['receiverEmail']}")
 
-
         # if 'emailConfigs' field is missing
         else:
             raise ConfigurationException("config.yaml: The field \"emailConfigs\" is missing")
@@ -114,6 +112,7 @@ def initialize() -> None:
             print(f"Setting accept-language to: {configs['scrapeConfigs']['acceptLang']}")
 
         # if 'scrapeConfigs' field is missing
+        # Note that scrapeConfigs and its child fields are optional, so no exception is raised
         else:
             # add scrapeConfigs to configs dict for default values
             configs['scrapeConfigs'] = {}
@@ -127,10 +126,17 @@ def initialize() -> None:
             configs['scrapeConfigs']['acceptLang'] = "en-US, en;q=0.5"
             print(f"Setting accept-language to: {configs['scrapeConfigs']['acceptLang']}")
 
-    # TODO: decide if you need exception handling. May be better to just have exception end program
+    # Error handling: Catch and rethrow any exceptions
+    # Since everything in this module is run at beginning of project, any exceptions here should end program
     except FileNotFoundError as fnf:
-        logging.error("config.yaml file not found. Please add a valid config.yaml file in the root")
-    # except yaml.YAMLError as yaml_err:
-    #     logging.error("An invalid yaml file was provided")
-    # except ConfigurationException as ce:
-    #     logging.error(ce)
+        print(f"config.yaml file not found. Please add a config.yaml file in the root\nException:\n{fnf}")
+        raise
+    except yaml.YAMLError as yaml_err:
+        print(f"An invalid yaml file was provided.\nException:\n{yaml_err}")
+        raise
+    except ConfigurationException as ce:
+        print(f"Invalid or missing values detected during project initialization:\n{ce}")
+        raise
+    except Exception as e:
+        print(f"An error occurred during project initialization:\n{e}")
+        raise
