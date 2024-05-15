@@ -15,7 +15,7 @@ class CustomLogger(logging.Logger):
         self.logfile = f"./log/{today.year}-{today.month}.log"
 
         # Create log Formatter, do not keep track
-        log_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] {%(filename)s} - %(message)s", "%Y-%m-%d %H:%M:%S")
+        log_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] {%(filename)s:%(lineno)d} - %(message)s", "%Y-%m-%d %H:%M:%S")
 
         # Initialize FileHandler for sending logs to file
         file_handler = logging.FileHandler(self.logfile)

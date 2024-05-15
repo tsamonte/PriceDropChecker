@@ -5,6 +5,7 @@ import email_handler
 import sys
 import schedule
 import time
+from CustomLogger import logger
 
 def initialize_app():
     # Initialize project configurations from config.yaml file
@@ -14,6 +15,9 @@ def initialize_app():
     email_handler.test_login()
 
 def run_app():
+    # Check if log file should be changed and update if needed
+    logger.change_logfile()
+
     # Retrieve data from csv
     data = manage_csv.open_csv()
 
@@ -35,8 +39,8 @@ def main():
             while True:
                 schedule.run_pending()
                 time.sleep(1)
-        except (KeyboardInterrupt, SystemExit):
-            print("Program ended")
+        except (KeyboardInterrupt, SystemExit) as end:
+            logger.info(f"Program ended ({end})")
 
     # if cmd argument "persist" wasn't passed, only run once
     else:

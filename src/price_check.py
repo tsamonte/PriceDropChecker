@@ -1,5 +1,6 @@
 import scrape_prices
 import email_handler
+from CustomLogger import logger
 
 def _price_to_float(price_string: str) -> float:
     """
@@ -51,6 +52,7 @@ def _update_prices(row: dict, scraped_data: dict) -> str:
                 difference = _price_to_float(row['StartingPrice']) - _price_to_float(scraped_data['price'])
                 message = f"&emsp;&emsp;The item is ${difference:.2f} less than when you added it to your list! Get it now for {scraped_data['price']}"
                 row['PreviousLow'] = scraped_data['price']
+                logger.info("Price drop found: scraped price < starting price & scraped price < previous low")
             # If scraped price is also HIGHER than previous low, we don't want to add to email
             # But we should overwrite the stored previous low
             else:
@@ -60,6 +62,7 @@ def _update_prices(row: dict, scraped_data: dict) -> str:
         if _price_to_float(scraped_data['price']) < _price_to_float(row['AllTimeLow']):
             row['AllTimeLow'] = scraped_data['price']
             message = f"&emsp;&emsp;The item has reached an all-time low!<br>{message}"
+            logger.info("Price is now lower than the recorded all-time low")
 
     # always set current price to the newly retrieved price
     row['CurrentPrice'] = scraped_data['price']
@@ -75,7 +78,7 @@ def _update_data(csv_data: [dict]) -> str:
     """
     msg_body = ""
     for row in csv_data:
-        print(f"Checking row {row['ID']}")
+        logger.info(f"Checking row {row['ID']} ({row['Link']})")
 
         # Using the link, scrape the data we need
         scraped_data = scrape_prices.get_data_amazon(row['Link'])
@@ -104,8 +107,8 @@ def notify_price_drops(csv_data: [dict]) -> None:
             smtp = email_handler.login()
             email_handler.send_email(smtp, msg_body)
             smtp.quit()
-            print("Price drop notification email sent")
+            logger.info("Price drop notification email sent")
         # In-depth error messages are logged within the above-called functions
         # Exceptions here should not end persistent program. Simply do not send email and continue running
         except:
-            print("Email unable to be sent")
+            logger.warning("Email unable to be sent")

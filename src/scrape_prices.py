@@ -1,6 +1,7 @@
 import ProjectConfigs
 import requests
 import bs4
+from CustomLogger import logger
 
 def _get_soup(link: str) -> bs4.BeautifulSoup | None:
     """
@@ -17,7 +18,7 @@ def _get_soup(link: str) -> bs4.BeautifulSoup | None:
         soup = bs4.BeautifulSoup(response.text, "lxml")
         return soup
     except Exception as exc:
-        print(f"There was an issue trying to download the web page ({link}):\n{exc}")
+        logger.warning(f"There was an issue trying to download the web page ({link}):\n\t{exc}")
         return None
 
 def get_data_amazon(link: str) -> dict:
@@ -41,5 +42,10 @@ def get_data_amazon(link: str) -> dict:
         item_name = soup.select("#productTitle")
         if len(item_name) > 0:
             data['name'] = item_name[0].getText().strip()
+
+    if len(data) > 0:
+        logger.info(f"Data scraped from the web page ({link}):\n\t{data}")
+    else:
+        logger.info("Web page did not contain name/price data needed for this program")
 
     return data

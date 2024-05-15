@@ -1,6 +1,7 @@
 import yaml
 import getpass
 from error.ConfigurationException import ConfigurationException
+from CustomLogger import logger
 
 configs = {}
 
@@ -40,6 +41,7 @@ def initialize() -> None:
     global configs
 
     try:
+        logger.info("Setting project configs from config.yaml")
         with open('config.yaml') as f:
             configs = yaml.safe_load(f)
 
@@ -47,11 +49,11 @@ def initialize() -> None:
         if 'emailConfigs' in configs:
             # validate smtpHost (required)
             _validate_required_field('emailConfigs', 'smtpHost', str)
-            print(f"Setting SMTP host to: {configs['emailConfigs']['smtpHost']}")
+            logger.info(f"Setting SMTP host to: {configs['emailConfigs']['smtpHost']}")
 
             # validate smtpPort (required)
             _validate_required_field('emailConfigs', 'smtpPort', int)
-            print(f"Setting SMTP port to: {configs['emailConfigs']['smtpPort']}")
+            logger.info(f"Setting SMTP port to: {configs['emailConfigs']['smtpPort']}")
 
             # validate sender email (optional)
             # If not provided, allow user to enter in console
@@ -62,21 +64,21 @@ def initialize() -> None:
                     # TODO: user input for email in loop. Validate email syntax and break when valid email provided
                     break
                 configs['emailConfigs']['senderEmail'] = email
-            print(f"Setting sender email to: {configs['emailConfigs']['senderEmail']}")
+            logger.info(f"Setting sender email to: {configs['emailConfigs']['senderEmail']}")
 
             # validate email app password (optional)
             # If not provided, allow user to enter in console
             if not _field_exists('emailConfigs', 'password'):
                 print("No app password provided. Please enter the app password")
                 configs['emailConfigs']['password'] = getpass.getpass("\tEnter password: ")
-            print("Email app password set")
+            logger.info("Email app password set")
 
             # validate receiver email (optional)
             # If not provided, set receiver email to be same as sender email
             if not _field_exists('emailConfigs', 'receiverEmail'):
                 print("No receiver email provided. Setting receiver email to the same value as sender email")
                 configs['emailConfigs']['receiverEmail'] = configs['emailConfigs']['senderEmail']
-            print(f"Setting receiver email to: {configs['emailConfigs']['receiverEmail']}")
+            logger.info(f"Setting receiver email to: {configs['emailConfigs']['receiverEmail']}")
 
         # if 'emailConfigs' field is missing
         else:
@@ -86,11 +88,11 @@ def initialize() -> None:
         if 'csvConfigs' in configs:
             # validate file name (required)
             _validate_required_field('csvConfigs', 'filePath')
-            print(f"Setting csv file path to: {configs['csvConfigs']['filePath']}")
+            logger.info(f"Setting csv file path to: {configs['csvConfigs']['filePath']}")
 
             # validate field names (required)
             _validate_required_field('csvConfigs', 'fieldNames', list)
-            print(f"Setting csv column names to: {configs['csvConfigs']['fieldNames']}")
+            logger.info(f"Setting csv column names to: {configs['csvConfigs']['fieldNames']}")
 
         # if 'csvConfigs' field is missing
         else:
@@ -103,13 +105,13 @@ def initialize() -> None:
             if not _field_exists('scrapeConfigs', 'userAgent'):
                 print("User agent was not provided. Setting user agent to default value")
                 configs['scrapeConfigs']['userAgent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
-            print(f"Setting user agent to: {configs['scrapeConfigs']['userAgent']}")
+            logger.info(f"Setting user agent to: \"{configs['scrapeConfigs']['userAgent']}\"")
 
             # validate accept language (optional)
             if not _field_exists('scrapeConfigs', 'acceptLang'):
                 print("Accept-language field was not provided. Setting accept language to default value")
                 configs['scrapeConfigs']['acceptLang'] = "en-US, en;q=0.5"
-            print(f"Setting accept-language to: {configs['scrapeConfigs']['acceptLang']}")
+            logger.info(f"Setting accept-language to: {configs['scrapeConfigs']['acceptLang']}")
 
         # if 'scrapeConfigs' field is missing
         # Note that scrapeConfigs and its child fields are optional, so no exception is raised
@@ -119,24 +121,24 @@ def initialize() -> None:
             # set default user agent
             print("User agent was not provided. Setting user agent to default value")
             configs['scrapeConfigs']['userAgent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
-            print(f"Setting user agent to: {configs['scrapeConfigs']['userAgent']}")
+            logger.info(f"Setting user agent to: \"{configs['scrapeConfigs']['userAgent']}\"")
 
             # set default accept-language
             print("Accept-language field was not provided. Setting accept language to default value")
             configs['scrapeConfigs']['acceptLang'] = "en-US, en;q=0.5"
-            print(f"Setting accept-language to: {configs['scrapeConfigs']['acceptLang']}")
+            logger.info(f"Setting accept-language to: \"{configs['scrapeConfigs']['acceptLang']}\"")
 
     # Error handling: Catch and rethrow any exceptions
     # Since everything in this module is run at beginning of project, any exceptions here should end program
     except FileNotFoundError as fnf:
-        print(f"config.yaml file not found. Please add a config.yaml file in the root\nException:\n{fnf}")
+        logger.error(f"config.yaml file not found. Please add a config.yaml file in the root\nException:\n{fnf}")
         raise
     except yaml.YAMLError as yaml_err:
-        print(f"An invalid yaml file was provided.\nException:\n{yaml_err}")
+        logger.error(f"An invalid yaml file was provided.\nException:\n\t{yaml_err}")
         raise
     except ConfigurationException as ce:
-        print(f"Invalid or missing values detected during project initialization:\n{ce}")
+        logger.error(f"Invalid or missing values detected during project initialization:\n\t{ce}")
         raise
     except Exception as e:
-        print(f"An error occurred during project initialization:\n{e}")
+        logger.error(f"An error occurred during project initialization:\n\t{e}")
         raise

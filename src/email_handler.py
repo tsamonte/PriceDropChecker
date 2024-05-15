@@ -3,6 +3,7 @@ import smtplib
 import email.errors
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from CustomLogger import logger
 
 def login() -> smtplib.SMTP:
     """
@@ -10,6 +11,7 @@ def login() -> smtplib.SMTP:
     :return: smtplib.SMTP object to use for sending emails
     """
     try:
+        logger.info(f"Attempting login at {ProjectConfigs.configs['emailConfigs']['smtpHost']}:{ProjectConfigs.configs['emailConfigs']['smtpPort']}")
         smtp = smtplib.SMTP(ProjectConfigs.configs['emailConfigs']['smtpHost'], ProjectConfigs.configs['emailConfigs']['smtpPort'])
         smtp.ehlo()
         smtp.starttls()
@@ -19,10 +21,10 @@ def login() -> smtplib.SMTP:
     # If exception happens at initialization (within email_handler.test_login()), end program
     # If exception happens during the core app logic (within price_check.notify_price_drops()), don't end program
     except (smtplib.SMTPException, smtplib.SMTPResponseException) as smtp_exc:
-        print(f"There was an issue trying to connect to the email server:\n{smtp_exc}")
+        logger.error(f"There was an issue trying to connect to the email server:\n\t{smtp_exc}")
         raise
     except Exception as e:
-        print(f"There was an issue during login:\n{e}")
+        logger.error(f"There was an issue during login:\n{e}")
         raise
 
 def test_login() -> None:
@@ -69,8 +71,8 @@ def send_email(smtp: smtplib.SMTP, msg_body: str) -> None:
                       ProjectConfigs.configs['emailConfigs']['receiverEmail'], msg_whole.as_string())
 
     except email.errors.MessageError as me:
-        print(f"An error occurred while building the email notification:\n{me}")
+        logger.error(f"An error occurred while building the email notification:\n\t{me}")
     except (smtplib.SMTPException, smtplib.SMTPResponseException) as smtp_exc:
-        print(f"There was an issue trying to send the email notification:\n{smtp_exc}")
+        logger.error(f"There was an issue trying to send the email notification:\n\t{smtp_exc}")
     except Exception as e:
-        print(f"There was an issue trying to build/send the email:\n{e}")
+        logger.error(f"There was an issue trying to build/send the email:\n\t{e}")
