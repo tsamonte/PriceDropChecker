@@ -1,0 +1,5 @@
+ID,Link,WebsiteName,ItemName,StartingPrice,PreviousLow,AllTimeLow,CurrentPrice
+1,https://www.amazon.com/dp/B0D1XD1ZV3,Amazon,NOTE: This row will populate with correct data on first run,,,,
+2,https://www.amazon.com/dp/B0C6RKLQHZ,Amazon,"GoPro HERO11 Black – E-Commerce Packaging - Waterproof Action Camera with 5.3K60 Ultra HD Video, 27MP Photos, 1/1.9"" Image Sensor, Live Streaming, Webcam, Stabilization",$290.99 ,$290.99 ,$257.79 ,$290.99 
+3,instagram.com,Instagram,NOTE: This row should be ignored by program,,,,
+4,https://www.amazon.com/dp/B071XNBL33,Amazon,Mario Kart 8 Deluxe,$59.99 ,$59.99 ,$59.99 ,$59.99 
