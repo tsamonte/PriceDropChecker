@@ -1,0 +1,12 @@
+emailConfigs:
+  senderEmail: # Optional; console input if missing
+  password: # Optional; console password input if missing
+  receiverEmail: # Optional; mirrors senderEmail if missing
+  smtpHost: smtp.gmail.com # Required; provided gmail host/port as example
+  smtpPort: 587 # Required
+csvConfigs:
+  filePath: "./data/sample-items.csv" # Required; provided sample file for example
+  fieldNames: [ID,Link,WebsiteName,ItemName,StartingPrice,PreviousLow,AllTimeLow,CurrentPrice] # Required; should mirror line 1 of csv
+scrapeConfigs:
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0" # Optional; default value used if missing
+  acceptLang: "en-US, en;q=0.5" # Optional; default value used if missing
