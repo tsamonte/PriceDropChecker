@@ -22,6 +22,9 @@ $(ACTIVATE): requirements.txt
 	$(PIP) install -r requirements.txt
 
 run: $(ACTIVATE)
+	$(PYTHON) src/main.py persist
+
+run-once: $(ACTIVATE)
 	$(PYTHON) src/main.py
 
 clean:
